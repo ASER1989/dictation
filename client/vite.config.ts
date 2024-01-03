@@ -17,13 +17,8 @@ export default defineConfig(({ command, mode }) => {
     },
     mode,
     server: {
-      port: 3107,
+      port: 2413,
       strictPort: true,
-      proxy: {
-        "^/api": {
-          target: "http://localhost:2413/",
-        },
-      },
       hmr: true,
     },
     esbuild: {
