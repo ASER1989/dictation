@@ -22,7 +22,7 @@ jobs:
         run: pnpm install
       # 这个步骤用来打包项目
       - name: Build
-        run: pnpm run build
+        run: pnpm run build:client
       # 这个步骤用来部署项目到github pages
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
