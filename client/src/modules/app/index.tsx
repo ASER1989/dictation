@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import './index.styl';
 import Button from '@client/components/button';
-import Textarea from '@client/components/textarea';
+import Input from '@client/components/input';
 import useSpeak from './useSpeak';
 import Words from '@client/components/words';
 import type { KeyboardEvent } from 'react';
+import { FaRegPaperPlane } from "react-icons/fa6";
 
 export default function App() {
 
     const [contentArray, setContentArray] = useState<Array<string>>([]);
     const [wordsInput, setWordsInput] = useState<string>();
+    const [dictationState, setDictationState] = useState<string | null>(null);
 
     const speak = useSpeak({
         interval: 3,
@@ -17,14 +19,17 @@ export default function App() {
     });
 
     const handleStart = () => {
+        setDictationState('running');
         speak.start(contentArray);
     }
 
     const handlePause = () => {
+        setDictationState('pause');
         speak.pause();
     }
 
     const handleResume = () => {
+        setDictationState('running');
         speak.resume();
     }
 
@@ -40,13 +45,19 @@ export default function App() {
         setWordsInput(newValue);
     }
 
-    const handleWordsAdd = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-        if (event.code === "Enter" && wordsInput) {
+
+    const handleWordsAdd = () => {
+        if (wordsInput) {
             setContentArray((ownState) => {
                 ownState.push(wordsInput.replace(/\n/g, ''));
                 return [...ownState];
             });
             setWordsInput("");
+        }
+    }
+    const handleWordsEnterDown = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.code === "Enter") {
+            handleWordsAdd()
         }
     }
 
@@ -59,13 +70,16 @@ export default function App() {
                     })
                 }
             </div>
-            <div>
-                <Textarea value={wordsInput} onKeyDown={handleWordsAdd} onChange={handleNewWordsChange}></Textarea>
-            </div>
-            <div>
-                <Button type='primary' onClick={handleStart}>开始听写</Button>
-                <Button onClick={handlePause}>暂停</Button>
-                <Button type='primary' onClick={handleResume}>继续</Button>
+            <div className='footer'>
+                <div className='input-container'>
+                    <Input value={wordsInput} onKeyDown={handleWordsAdd} onChange={handleNewWordsChange} placeholder='输入听写内容，可以通过Enter键提交' />
+                    <FaRegPaperPlane className='words-submit' onClick={handleWordsAdd} />
+                </div>
+                <div className='button-list'>
+                    {dictationState === null && <Button type='primary' onClick={handleStart}>开始听写</Button>}
+                    {dictationState === 'running' && <Button onClick={handlePause}>暂停</Button>}
+                    {dictationState === 'pause' && <Button type='primary' onClick={handleResume}>继续</Button>}
+                </div>
             </div>
         </div>
     )

@@ -1,8 +1,38 @@
 .app
-    display block
+    display flex
+    flex-direction column
     height 100%
     
     .words-list
         display flex
         gap 20px
         flex-wrap wrap
+        flex 1
+        overflow auto 
+        position relative
+        padding 20px 20px
+
+    .footer
+        height 60px
+        padding-top 10px
+        box-sizing border-box
+        display flex
+        align-items center
+
+        .input-container
+            padding 0 10px
+            display: block
+            box-sizing: border-box
+            flex 1
+            position relative
+            .words-submit
+                position absolute
+                right 15px
+                top 5px
+                cursor pointer
+            input
+                width 100%
+                padding-right 100px
+
+        .button-list
+            width 120px

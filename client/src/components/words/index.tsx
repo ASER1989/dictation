@@ -1,6 +1,6 @@
 import React from 'react';
 import './index.styl';
-import { CiCircleRemove } from "react-icons/ci";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 type Props = {
     onRemove: (words: string) => void;
@@ -15,7 +15,7 @@ export default function Words(props: Props) {
     }
     return (
         <div className='words'>
-            <CiCircleRemove onClick={handleRemoveClick} className='words-remove' />
+            <RiDeleteBinLine onClick={handleRemoveClick} className='words-remove' />
             {children}
         </div>
     )
