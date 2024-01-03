@@ -30,4 +30,4 @@ jobs:
           # 这里需要设置您的github令牌，您可以在https://github.com/settings/tokens生成一个
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # 这里需要设置您的项目打包后的输出目录，一般是dist或build
-          publish_dir: ./dist
+          publish_dir: ./client/dist
