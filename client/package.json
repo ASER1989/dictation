@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "vite"
+    "client:check": "tsc --pretty",
+    "build:client": "tsc && vite build",
+    "build:client:watch": "tsc && vite build -w",
+    "dev": "vite",
+    "prettier:fix": "prettier --write ."
   },
   "keywords": [],
   "author": "",
