@@ -1,0 +1,38 @@
+.DS_Store
+
+# Set of ignore rules for most popular IDEs in our project.
+# Reasoning is to allow easier onboarding into the project without need to configure global ignore rules.
+# However, if your exotic setup is not listed below, feel free to use global ignore: https://help.github.com/en/articles/ignoring-files#create-a-global-gitignore
+.idea
+.vs
+.vscode/
+.stgo-vscode
+.atom
+*.sublime-workspace
+*.sublime-project
+.tern-project
+*.code-workspace
+# package manager
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# linter
+*.eslintcache
+eslint-output.*
+.eslintrc.json
+
+# build artifacts
+/dist/
+# TypeScript cache
+.tscache/
+# IDE runtime log files
+/report.*.json
+/debug.log
+
+# Babel cache (used on the build servers)
+.babel-loader-cache/
+
+.webpack-cache/
+
+**/dist
