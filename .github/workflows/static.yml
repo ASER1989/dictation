@@ -1,43 +1,33 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
-
+name: Deploy
 on:
-  # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: read
-  id-token: write
-
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
+    branches:
+      - main
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # 这个工作流程有一个名为build-and-deploy的任务
+  build-and-deploy:
+    # 这个任务运行在ubuntu-latest的环境中
     runs-on: ubuntu-latest
     steps:
+      # 这个步骤用来检出代码
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/checkout@v2
+      # 这个步骤用来安装pnpm
+      - name: Install pnpm
+        run: curl -f https://get.pnpm.io/v6.js | node - add --global pnpm
+      - name: Change work dir
+        run: cd ./client
+      # 这个步骤用来安装依赖
+      - name: Install dependencies
+        run: pnpm install
+      # 这个步骤用来打包项目
+      - name: Build
+        run: pnpm run build
+      # 这个步骤用来部署项目到github pages
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          # Upload entire repository
-          path: './client/dist'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          # 这里需要设置您的github令牌，您可以在https://github.com/settings/tokens生成一个
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # 这里需要设置您的项目打包后的输出目录，一般是dist或build
+          publish_dir: ./dist
