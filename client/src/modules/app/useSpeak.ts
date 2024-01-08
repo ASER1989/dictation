@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState,useEffect } from "react";
 
 type Props = {
   volume?: number;
@@ -7,10 +7,11 @@ type Props = {
   interval?: number;
   repeat?: number;
   contentArray: Array<string>;
+  voice: SpeechSynthesisVoice;
 };
 
 export default function useSpeak(props: Props) {
-  const { interval = 8, repeat = 3 } = props;
+  const { interval = 6, repeat = 4 } = props;
 
   const [contentArray, setContentArray] = useState<Array<string>>(
     props.contentArray,
@@ -18,27 +19,33 @@ export default function useSpeak(props: Props) {
   const timerRef = useRef<NodeJS.Timeout>();
   const repeatTimesRef = useRef<number>(0);
   const contentRef = useRef<string>();
+  const indexRef = useRef<number>(0);
 
   const speak = useCallback(
     (content: string) => {
       return new Promise((resolve) => {
-        const { volume = 1, lang, rate = 1 } = props;
+        const { volume = 1, voice, rate = 0.6 } = props;
         const utterance = new SpeechSynthesisUtterance(content);
+       
 
         utterance.volume = volume;
-        utterance.lang = lang ?? "en";
         utterance.rate = rate;
+        utterance.voice = voice;
         utterance.onend = resolve;
-        window.speechSynthesis.speak(utterance);
+       
+        speechSynthesis.speak(utterance);
       });
     },
     [props],
   );
 
-  const next = () => {
+
+
+  const getWords = () => {
     repeatTimesRef.current = 0;
-    contentRef.current = contentArray.shift();
-  };
+    contentRef.current = contentArray[indexRef.current];
+    indexRef.current += 1;
+  }
 
   const inovkeSpeak = async () => {
     if (contentRef.current) {
@@ -46,7 +53,7 @@ export default function useSpeak(props: Props) {
       repeatTimesRef.current += 1;
 
       if (repeatTimesRef.current >= repeat) {
-        next();
+        getWords();
       }
 
       clearTimeout(timerRef.current);
@@ -57,11 +64,12 @@ export default function useSpeak(props: Props) {
     }
   };
 
-  const start = (newContent: Array<string>) => {
+  const start = (newContent?: Array<string>) => {
     if (newContent) {
       setContentArray(newContent);
+      indexRef.current = 0;
     }
-    next();
+    getWords();
     inovkeSpeak();
   };
 
@@ -73,9 +81,14 @@ export default function useSpeak(props: Props) {
     inovkeSpeak();
   };
 
+  const next = () => {
+    start()
+  };
+
   return {
     start,
     pause,
     resume,
+    next
   };
 }

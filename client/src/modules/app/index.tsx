@@ -6,15 +6,19 @@ import useSpeak from "./useSpeak";
 import Words from "@client/components/words";
 import type { KeyboardEvent } from "react";
 import { FaRegPaperPlane } from "react-icons/fa6";
+import testData from './test.json';
 
 export default function App() {
-  const [contentArray, setContentArray] = useState<Array<string>>([]);
+  const [contentArray, setContentArray] = useState<Array<string>>(testData);
   const [wordsInput, setWordsInput] = useState<string>();
   const [dictationState, setDictationState] = useState<string | null>(null);
+
+  const voiceList = speechSynthesis.getVoices().filter(item=>item.lang==="zh-CN");
 
   const speak = useSpeak({
     interval: 3,
     contentArray,
+    voice: voiceList[1]
   });
 
   const handleStart = () => {
@@ -69,7 +73,7 @@ export default function App() {
         <div className="input-container">
           <Input
             value={wordsInput}
-            onKeyDown={handleWordsAdd}
+            onKeyDown={handleWordsEnterDown}
             onChange={handleNewWordsChange}
             placeholder="输入听写内容，可以通过Enter键提交"
           />
