@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState,useEffect } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 
 type Props = {
   volume?: number;
@@ -11,7 +11,7 @@ type Props = {
 };
 
 export default function useSpeak(props: Props) {
-  const { interval = 6, repeat = 4 } = props;
+  const { interval = 6, repeat = 4, volume = 1, voice, rate = 0.6 } = props;
 
   const [contentArray, setContentArray] = useState<Array<string>>(
     props.contentArray,
@@ -24,19 +24,18 @@ export default function useSpeak(props: Props) {
   const speak = useCallback(
     (content: string) => {
       return new Promise((resolve) => {
-        const { volume = 1, voice, rate = 0.6 } = props;
         const utterance = new SpeechSynthesisUtterance(content);
-       
+
 
         utterance.volume = volume;
         utterance.rate = rate;
         utterance.voice = voice;
         utterance.onend = resolve;
-       
+
         speechSynthesis.speak(utterance);
       });
     },
-    [props],
+    [volume, voice, rate],
   );
 
 

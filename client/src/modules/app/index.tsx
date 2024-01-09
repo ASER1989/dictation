@@ -1,25 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import "./index.styl";
 import Button from "@client/components/button";
 import Input from "@client/components/input";
 import useSpeak from "./useSpeak";
 import Words from "@client/components/words";
+import Dropdown from "@client/components/dropdown";
+import type { DropdownOption } from "@client/components/dropdown";
 import type { KeyboardEvent } from "react";
 import { FaRegPaperPlane } from "react-icons/fa6";
 import testData from './test.json';
 
 export default function App() {
+
+  const voiceList = speechSynthesis.getVoices().filter(item => item.lang === "zh-CN");
+
   const [contentArray, setContentArray] = useState<Array<string>>(testData);
   const [wordsInput, setWordsInput] = useState<string>();
   const [dictationState, setDictationState] = useState<string | null>(null);
+  const [currentVoice, setCurrentVoice] = useState<SpeechSynthesisVoice>(voiceList[0]);
 
-  const voiceList = speechSynthesis.getVoices().filter(item=>item.lang==="zh-CN");
 
   const speak = useSpeak({
     interval: 3,
     contentArray,
-    voice: voiceList[1]
+    voice: currentVoice
   });
+
+  const getVoiceOptions = () => voiceList.map(item => ({
+    value: item.voiceURI,
+    label: item.name
+  }))
 
   const handleStart = () => {
     setDictationState("running");
@@ -35,6 +45,10 @@ export default function App() {
     setDictationState("running");
     speak.resume();
   };
+
+  const handleNext = () => {
+    speak.next();
+  }
 
   const handleWordsRemove = (removeIndex: number) => {
     setContentArray((ownState) => {
@@ -62,6 +76,13 @@ export default function App() {
     }
   };
 
+  const handleVoiceChange = (voiceOption: DropdownOption) => {
+    const voice = voiceList.find(item => item.voiceURI === voiceOption.value);
+    if (voice) {
+      setCurrentVoice(voice);
+    }
+  }
+
   return (
     <div className="app">
       <div className="words-list">
@@ -79,6 +100,9 @@ export default function App() {
           />
           <FaRegPaperPlane className="words-submit" onClick={handleWordsAdd} />
         </div>
+        <div className="footer-options">
+          <Dropdown options={getVoiceOptions()} onChange={handleVoiceChange}></Dropdown>
+        </div>
         <div className="button-list">
           {dictationState === null && (
             <Button type="primary" onClick={handleStart}>
@@ -86,7 +110,10 @@ export default function App() {
             </Button>
           )}
           {dictationState === "running" && (
-            <Button onClick={handlePause}>暂停</Button>
+            <div className="button-group">
+              <Button onClick={handlePause}>暂停</Button>
+              <Button onClick={handleNext} type="primary">继续</Button>
+            </div>
           )}
           {dictationState === "pause" && (
             <Button type="primary" onClick={handleResume}>
