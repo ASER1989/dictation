@@ -1,0 +1,22 @@
+{
+  "baiduConfig": {
+    "requestUri": "//tsn.baidu.com/text2audio",
+    "params": {
+      "tok": "24.ae2c4a4151dd455b857a4512d1315d4d.2592000.1712994272.282335-46850464",
+      "cuid": "judU5faIf13lfuKaAz5DHbBbRzjcAPUg",
+      "ctp": "1",
+      "lan": "zh",
+      "spd": 3,
+      "pit": 6,
+      "vol": 9,
+      "per": 3,
+      "aue": 3
+    }
+  },
+  "speechSynthesisConfig": {
+    "volume": 1,
+    "rate": 1,
+    "lang": "zh-CN"
+  },
+  "peroration": "听写结束"
+}

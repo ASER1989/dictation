@@ -1,93 +1,89 @@
-import { useCallback, useRef, useState, useEffect } from "react";
+import {useRef, useState} from "react";
+import {textToVoice} from "@client/models/textToVoice/baiduVoice";
+import {ITextToVoice} from "@client/models/textToVoice/types";
 
 type Props = {
-  volume?: number;
-  lang?: string;
-  rate?: number;
-  interval?: number;
-  repeat?: number;
-  contentArray: Array<string>;
-  voice: SpeechSynthesisVoice;
+    interval?: number;
+    repeat?: number;
+    contentArray: Array<string>;
 };
 
 export default function useSpeak(props: Props) {
-  const { interval = 6, repeat = 4, volume = 1, voice, rate = 0.6 } = props;
+    const {interval = 5, repeat = 5} = props;
 
-  const [contentArray, setContentArray] = useState<Array<string>>(
-    props.contentArray,
-  );
-  const timerRef = useRef<NodeJS.Timeout>();
-  const repeatTimesRef = useRef<number>(0);
-  const contentRef = useRef<string>();
-  const indexRef = useRef<number>(0);
+    const [contentArray, setContentArray] = useState<Array<string>>(
+        props.contentArray,
+    );
+    const timerRef = useRef<NodeJS.Timeout>();
+    const repeatTimesRef = useRef<number>(0);
+    const contentRef = useRef<string>();
+    const indexRef = useRef<number>(0);
 
-  const speak = useCallback(
-    (content: string) => {
-      return new Promise((resolve) => {
-        const utterance = new SpeechSynthesisUtterance(content);
+    const voiceObjectRef = useRef<ITextToVoice>();
 
+    const handleSpeechEnd = async () => {
+        const voiceObject = await textToVoice('');
+        voiceObject.play();
+    }
 
-        utterance.volume = volume;
-        utterance.rate = rate;
-        utterance.voice = voice;
-        utterance.onend = resolve;
-
-        speechSynthesis.speak(utterance);
-      });
-    },
-    [volume, voice, rate],
-  );
+    const getWords = () => {
+        if (contentArray.length < indexRef.current) {
+            handleSpeechEnd();
+        }
+        contentRef.current = contentArray[indexRef.current];
+        indexRef.current += 1;
+    }
 
 
+    const handleVoicePlayEnd = () => {
+        repeatTimesRef.current += 1;
+        if (repeatTimesRef.current >= repeat) {
+            repeatTimesRef.current = 0;
+            voiceObjectRef.current = undefined;
+            getWords();
+        }
+        clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(
+            async () => await speech(),
+            interval * 1000,
+        );
+    }
+    const speech = async () => {
+        if (contentRef.current) {
+            if (!voiceObjectRef.current) {
+                voiceObjectRef.current = await textToVoice(contentRef.current);
+                voiceObjectRef.current.onEnd(handleVoicePlayEnd);
+            }
+            voiceObjectRef.current.play();
+        }
+    }
 
-  const getWords = () => {
-    repeatTimesRef.current = 0;
-    contentRef.current = contentArray[indexRef.current];
-    indexRef.current += 1;
-  }
-
-  const inovkeSpeak = async () => {
-    if (contentRef.current) {
-      await speak(contentRef.current);
-      repeatTimesRef.current += 1;
-
-      if (repeatTimesRef.current >= repeat) {
+    const start = (newContent?: Array<string>) => {
+        if (newContent) {
+            setContentArray(newContent);
+            indexRef.current = 0;
+        }
         getWords();
-      }
+        speech();
+    };
 
-      clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(
-        async () => await inovkeSpeak(),
-        interval * 1000,
-      );
-    }
-  };
+    const pause = () => {
+        voiceObjectRef.current?.pause();
+    };
 
-  const start = (newContent?: Array<string>) => {
-    if (newContent) {
-      setContentArray(newContent);
-      indexRef.current = 0;
-    }
-    getWords();
-    inovkeSpeak();
-  };
+    const resume = () => {
+        voiceObjectRef.current?.play();
+    };
 
-  const pause = () => {
-    clearTimeout(timerRef.current);
-  };
+    const next = () => {
+        voiceObjectRef.current = undefined;
+        start()
+    };
 
-  const resume = () => {
-    inovkeSpeak();
-  };
-
-  const next = () => {
-    start()
-  };
-
-  return {
-    start,
-    pause,
-    resume,
-    next
-  };
+    return {
+        start,
+        pause,
+        resume,
+        next
+    };
 }
