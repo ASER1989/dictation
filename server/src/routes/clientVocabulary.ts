@@ -1,8 +1,8 @@
 import Router from '@koa/router';
-import type { Context } from 'koa';
-import { extname } from 'path';
-import { readFile } from 'fs/promises';
-import { getAudioAbsolutePath } from '../services/ttsStore';
+import type {Context} from 'koa';
+import {extname} from 'path';
+import {readFile} from 'fs/promises';
+import {getAudioAbsolutePath} from '../services/ttsStore';
 import {
   getVocabularyBookForDictation,
   getVocabularyBooks,
@@ -28,7 +28,7 @@ function formatId(prefix: string, rawValue: string) {
 }
 
 export default (prefix: string) => {
-  const router = new Router({ prefix });
+  const router = new Router({prefix});
 
   router.get('/client/books/tree', async (ctx: Context) => {
     const books = await getVocabularyBooks();
@@ -106,7 +106,7 @@ export default (prefix: string) => {
       });
     });
 
-    return  { items: Array.from(gradeMap.values()) };
+    return {items: Array.from(gradeMap.values())};
   });
 
   router.get('/client/vocabularies', async (ctx: Context) => {
@@ -121,7 +121,7 @@ export default (prefix: string) => {
       wordCount: item.words.length,
     }));
 
-    ctx.body = { items };
+    return {items};
   });
 
   router.get('/client/vocabularies/:id/dictation', async (ctx: Context) => {
@@ -147,7 +147,7 @@ export default (prefix: string) => {
       });
     }
 
-    ctx.body = {
+    return {
       book: {
         id: target.id,
         name: target.name,

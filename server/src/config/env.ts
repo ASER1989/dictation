@@ -23,7 +23,6 @@ function loadEnvFile() {
       if (process.env[key] === undefined) {
         process.env[key] = value;
       }
-      console.log(process.env)
     });
 }
 

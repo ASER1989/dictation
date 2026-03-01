@@ -1,9 +1,14 @@
 import Router from '@koa/router';
 import type { Context } from 'koa';
 import {
+  SUPPORTED_TTS_VOICES,
+  type TtsRegenerateOptions,
+} from '../services/ttsStore';
+import {
   createVocabularyBook,
   deleteVocabularyBook,
   getVocabularyBooks,
+  regenerateVocabularyWordAudio,
   updateVocabularyBook,
 } from '../services/vocabularyStore';
 import type { VocabularyBookInput } from '../types/vocabulary';
@@ -79,6 +84,52 @@ export default (prefix: string) => {
     }
 
     ctx.body = { deleted: true };
+  });
+
+  router.post('/vocabularies/:id/audio/regenerate', async (ctx: Context) => {
+    const body = (ctx.request.body ?? {}) as Record<string, unknown>;
+    const word = typeof body.word === 'string' ? body.word : '';
+    const voice = typeof body.voice === 'string' ? body.voice : undefined;
+    const speedRaw = body.speed;
+
+    if (!word.trim()) {
+      ctx.throw(400, '词汇不能为空');
+    }
+
+    const options: TtsRegenerateOptions = {};
+    if (voice !== undefined) {
+      const validVoice = SUPPORTED_TTS_VOICES.find((item) => item === voice);
+      if (!validVoice) {
+        ctx.throw(400, '音色不支持');
+      }
+      options.voice = validVoice;
+    }
+
+    if (speedRaw !== undefined) {
+      const speedNumber =
+        typeof speedRaw === 'number'
+          ? speedRaw
+          : typeof speedRaw === 'string'
+            ? Number(speedRaw)
+            : Number.NaN;
+      if (!Number.isFinite(speedNumber) || speedNumber < 0.5 || speedNumber > 2) {
+        ctx.throw(400, '速度参数必须在 0.5 到 2 之间');
+      }
+      options.speed = speedNumber;
+    }
+
+    let item;
+    try {
+      item = await regenerateVocabularyWordAudio(ctx.params.id, word, options);
+    } catch (error) {
+      ctx.throw(400, (error as Error).message || '重新生成词汇音频失败');
+    }
+
+    if (!item) {
+      ctx.throw(404, '词汇表不存在');
+    }
+
+    ctx.body = { item };
   });
 
   return router.routes();

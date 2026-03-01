@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "@client/components/button";
 import Textarea from "@client/components/textarea";
@@ -6,8 +6,10 @@ import {
   createVocabulary,
   deleteVocabulary,
   fetchVocabularyBooks,
+  regenerateVocabularyAudio,
   updateVocabulary,
 } from "@client/models/vocabularyApi";
+import type { RegenerateAudioOptions } from "@client/models/vocabularyApi";
 import type { VocabularyBook, VocabularyBookPayload } from "@client/types/vocabulary";
 import "./index.styl";
 
@@ -28,6 +30,19 @@ const defaultFormState: FormState = {
   lesson: "",
   wordsText: "",
 };
+
+const regenerateVoiceOptions: Array<{
+  label: string;
+  value: NonNullable<RegenerateAudioOptions["voice"]>;
+}> = [
+  { label: "tongtong", value: "tongtong" },
+  { label: "chuichui", value: "chuichui" },
+  { label: "xiaochen", value: "xiaochen" },
+  { label: "jam", value: "jam" },
+  { label: "kazi", value: "kazi" },
+  { label: "douji", value: "douji" },
+  { label: "luodo", value: "luodo" },
+];
 
 function wordsToText(words: string[]): string {
   return words.join("\n");
@@ -72,9 +87,16 @@ export default function VocabulariesPage() {
   const [items, setItems] = useState<VocabularyBook[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [playingWordKey, setPlayingWordKey] = useState<string | null>(null);
+  const [regeneratingWordKey, setRegeneratingWordKey] = useState<string | null>(null);
+  const [regenerateVoice, setRegenerateVoice] = useState<
+    NonNullable<RegenerateAudioOptions["voice"]>
+  >("tongtong");
+  const [regenerateSpeed, setRegenerateSpeed] = useState<string>("1");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(defaultFormState);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const isEditing = editingId !== null;
   const hasItems = items.length > 0;
@@ -101,6 +123,15 @@ export default function VocabulariesPage() {
 
   useEffect(() => {
     loadItems();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause();
+        previewAudioRef.current = null;
+      }
+    };
   }, []);
 
   const handleInputChange = (key: keyof FormState, value: string) => {
@@ -143,6 +174,73 @@ export default function VocabulariesPage() {
       }
     } catch (error) {
       setErrorMessage((error as Error).message || "删除失败");
+    }
+  };
+
+  const getWordAudioFileName = (item: VocabularyBook, word: string) => {
+    const match = item.wordAudios?.find((audioItem) => audioItem.word === word.trim());
+    return match?.audioFileName;
+  };
+
+  const handlePreviewWordAudio = (item: VocabularyBook, word: string, index: number) => {
+    const fileName = getWordAudioFileName(item, word);
+    if (!fileName) {
+      setErrorMessage(`词汇「${word}」暂无可试听音频，请先重新生成`);
+      return;
+    }
+
+    const wordKey = `${item.id}-${index}`;
+    setErrorMessage(null);
+
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current.currentTime = 0;
+      previewAudioRef.current = null;
+    }
+
+    const audio = new Audio(`/api/client/audio/${fileName}?t=${Date.now()}`);
+    previewAudioRef.current = audio;
+    setPlayingWordKey(wordKey);
+
+    const clearPlaying = () => {
+      if (previewAudioRef.current === audio) {
+        previewAudioRef.current = null;
+      }
+      setPlayingWordKey((prevState) => (prevState === wordKey ? null : prevState));
+    };
+
+    audio.onended = clearPlaying;
+    audio.onerror = clearPlaying;
+
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => clearPlaying());
+    }
+  };
+
+  const handleRegenerateWordAudio = async (item: VocabularyBook, word: string, index: number) => {
+    const speedNumber = Number(regenerateSpeed);
+    if (!Number.isFinite(speedNumber) || speedNumber < 0.5 || speedNumber > 2) {
+      setErrorMessage("语速参数必须在 0.5 到 2 之间");
+      return;
+    }
+
+    const wordKey = `${item.id}-${index}`;
+    setRegeneratingWordKey(wordKey);
+    setErrorMessage(null);
+
+    try {
+      const updatedItem = await regenerateVocabularyAudio(item.id, word, {
+        voice: regenerateVoice,
+        speed: speedNumber,
+      });
+      setItems((prevState) =>
+        prevState.map((currentItem) => (currentItem.id === updatedItem.id ? updatedItem : currentItem)),
+      );
+    } catch (error) {
+      setErrorMessage((error as Error).message || "重新生成音频失败");
+    } finally {
+      setRegeneratingWordKey(null);
     }
   };
 
@@ -251,6 +349,34 @@ export default function VocabulariesPage() {
 
         <div className="vocab-panel list-panel">
           <div className="panel-title">词汇表列表</div>
+          <div className="audio-regenerate-config">
+            <div className="audio-config-item">
+              <label>音色</label>
+              <select
+                value={regenerateVoice}
+                onChange={(event) =>
+                  setRegenerateVoice(event.target.value as NonNullable<RegenerateAudioOptions["voice"]>)
+                }
+              >
+                {regenerateVoiceOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="audio-config-item">
+              <label>语速</label>
+              <input
+                type="number"
+                min={0.5}
+                max={2}
+                step={0.1}
+                value={regenerateSpeed}
+                onChange={(event) => setRegenerateSpeed(event.target.value)}
+              />
+            </div>
+          </div>
 
           {loading && <div className="list-tip">加载中...</div>}
           {!loading && !hasItems && <div className="list-tip">暂无词汇表，请先新建。</div>}
@@ -265,7 +391,36 @@ export default function VocabulariesPage() {
                       {item.grade} / {item.version} / {item.unit}
                       {item.lesson ? ` / ${item.lesson}` : ""}
                     </div>
-                    <div className="item-words">{item.words.join("、") || "（无词汇）"}</div>
+                    <div className="item-words-summary">词汇数量：{item.words.length}</div>
+                    <div className="item-word-list">
+                      {item.words.length === 0 && <div className="item-word-empty">（无词汇）</div>}
+                      {item.words.map((word, index) => {
+                        const wordKey = `${item.id}-${index}`;
+                        const hasAudio = Boolean(getWordAudioFileName(item, word));
+                        const isPlaying = playingWordKey === wordKey;
+                        const isRegenerating = regeneratingWordKey === wordKey;
+
+                        return (
+                          <div className="word-row" key={wordKey}>
+                            <div className="word-label">{word}</div>
+                            <div className="word-actions">
+                              <Button
+                                onClick={() => handlePreviewWordAudio(item, word, index)}
+                                disabeld={!hasAudio || isRegenerating}
+                              >
+                                {isPlaying ? "播放中" : "试听"}
+                              </Button>
+                              <Button
+                                onClick={() => handleRegenerateWordAudio(item, word, index)}
+                                disabeld={isRegenerating}
+                              >
+                                {isRegenerating ? "生成中" : "重新生成"}
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                   <div className="item-actions">
                     <Button onClick={() => handleEdit(item)}>编辑</Button>

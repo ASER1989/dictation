@@ -1,8 +1,8 @@
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { ensureWordAudios } from './ttsStore';
-import type { VocabularyBook, VocabularyBookInput } from '../types/vocabulary';
+import { ensureWordAudios, regenerateWordAudio, type TtsRegenerateOptions } from './ttsStore';
+import type { VocabularyBook, VocabularyBookInput, WordAudioItem } from '../types/vocabulary';
 
 const dataFilePath = new URL('../data/vocabularies.json', import.meta.url);
 const dataFilePathname = fileURLToPath(dataFilePath);
@@ -147,6 +147,41 @@ export async function getVocabularyBookForDictation(id: string): Promise<Vocabul
     await saveVocabularyBooks(books);
   }
 
+  return target;
+}
+
+export async function regenerateVocabularyWordAudio(
+  id: string,
+  word: string,
+  options?: TtsRegenerateOptions
+): Promise<VocabularyBook | null> {
+  const books = await getVocabularyBooks();
+  const target = books.find((item) => item.id === id);
+
+  if (!target) {
+    return null;
+  }
+
+  const normalizedWord = word.trim();
+  if (!normalizedWord) {
+    throw new Error('词汇不能为空');
+  }
+
+  const hasWord = target.words.some((item) => item.trim() === normalizedWord);
+  if (!hasWord) {
+    throw new Error('该词汇不在当前词汇表中');
+  }
+
+  const regeneratedAudio = await regenerateWordAudio(normalizedWord, options);
+  const audioMap = new Map((target.wordAudios ?? []).map((item) => [item.word, item]));
+  audioMap.set(regeneratedAudio.word, regeneratedAudio);
+
+  target.wordAudios = target.words
+    .map((item) => audioMap.get(item.trim()))
+    .filter((item): item is WordAudioItem => Boolean(item));
+  target.updatedAt = new Date().toISOString();
+
+  await saveVocabularyBooks(books);
   return target;
 }
 

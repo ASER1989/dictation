@@ -6,6 +6,21 @@ import { fileURLToPath } from 'url';
 import { envConfig } from '../config/env';
 import type { WordAudioItem } from '../types/vocabulary';
 
+export const SUPPORTED_TTS_VOICES = [
+  'tongtong',
+  'chuichui',
+  'xiaochen',
+  'jam',
+  'kazi',
+  'douji',
+  'luodo',
+] as const;
+
+export type TtsRegenerateOptions = {
+  voice?: (typeof SUPPORTED_TTS_VOICES)[number];
+  speed?: number;
+};
+
 type WordAudioCache = Record<
   string,
   {
@@ -82,10 +97,13 @@ async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
-async function requestWordAudio(word: string): Promise<Buffer> {
+async function requestWordAudio(word: string, options?: TtsRegenerateOptions): Promise<Buffer> {
   if (!envConfig.bigModelApiKey) {
     throw new Error('BIGMODEL_API_KEY 未配置，无法生成词汇语音');
   }
+
+  const resolvedVoice = options?.voice ?? envConfig.bigModelTtsVoice;
+  const resolvedSpeed = options?.speed ?? envConfig.bigModelTtsSpeed;
 
   const response = await fetch(envConfig.bigModelTtsUrl, {
     method: 'POST',
@@ -96,8 +114,8 @@ async function requestWordAudio(word: string): Promise<Buffer> {
     body: JSON.stringify({
       model: envConfig.bigModelTtsModel,
       input: word,
-      voice: envConfig.bigModelTtsVoice,
-      speed: envConfig.bigModelTtsSpeed,
+      voice: resolvedVoice,
+      speed: resolvedSpeed,
       volume: envConfig.bigModelTtsVolume,
       response_format: envConfig.bigModelTtsFormat,
     }),
@@ -159,6 +177,40 @@ async function createOrReuseWordAudio(
       audioRelativePath: relativePath,
     },
     cacheUpdated: true,
+  };
+}
+
+export async function regenerateWordAudio(
+  word: string,
+  options?: TtsRegenerateOptions
+): Promise<WordAudioItem> {
+  await ensureDataFiles();
+  const normalizedWord = normalizeWord(word);
+
+  if (!normalizedWord) {
+    throw new Error('词汇不能为空');
+  }
+
+  const cache = await readAudioCache();
+  const fileName = getAudioFileName(normalizedWord);
+  const absolutePath = path.join(audioDirPath, fileName);
+  const relativePath = toRelativeAudioPath(fileName);
+
+  const audioBuffer = await requestWordAudio(normalizedWord, options);
+  await writeFile(absolutePath, audioBuffer);
+
+  cache[normalizedWord] = {
+    word: normalizedWord,
+    audioFileName: fileName,
+    audioRelativePath: relativePath,
+    updatedAt: new Date().toISOString(),
+  };
+  await saveAudioCache(cache);
+
+  return {
+    word: normalizedWord,
+    audioFileName: fileName,
+    audioRelativePath: relativePath,
   };
 }
 

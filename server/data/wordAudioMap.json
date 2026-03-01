@@ -3,18 +3,42 @@
     "word": "你好",
     "audioFileName": "440ee0853ad1e99f.wav",
     "audioRelativePath": "data/audio/440ee0853ad1e99f.wav",
-    "updatedAt": "2026-03-01T08:18:10.091Z"
+    "updatedAt": "2026-03-01T11:15:10.597Z"
   },
   "未来": {
     "word": "未来",
     "audioFileName": "48595908a409cc0a.wav",
     "audioRelativePath": "data/audio/48595908a409cc0a.wav",
-    "updatedAt": "2026-03-01T08:18:10.875Z"
+    "updatedAt": "2026-03-01T11:16:11.410Z"
   },
   "爷爷": {
     "word": "爷爷",
     "audioFileName": "bf795b2847d7213e.wav",
     "audioRelativePath": "data/audio/bf795b2847d7213e.wav",
-    "updatedAt": "2026-03-01T08:18:11.824Z"
+    "updatedAt": "2026-03-01T11:15:58.760Z"
+  },
+  "观潮": {
+    "word": "观潮",
+    "audioFileName": "ded9444d63d23d27.wav",
+    "audioRelativePath": "data/audio/ded9444d63d23d27.wav",
+    "updatedAt": "2026-03-01T11:17:16.417Z"
+  },
+  "据说": {
+    "word": "据说",
+    "audioFileName": "7eab8dcab130a1da.wav",
+    "audioRelativePath": "data/audio/7eab8dcab130a1da.wav",
+    "updatedAt": "2026-03-01T11:19:51.949Z"
+  },
+  "河堤": {
+    "word": "河堤",
+    "audioFileName": "0db9b24b9983ec04.wav",
+    "audioRelativePath": "data/audio/0db9b24b9983ec04.wav",
+    "updatedAt": "2026-03-01T13:36:40.798Z"
+  },
+  "宽阔": {
+    "word": "宽阔",
+    "audioFileName": "ea5b4074592081b9.wav",
+    "audioRelativePath": "data/audio/ea5b4074592081b9.wav",
+    "updatedAt": "2026-03-01T11:17:19.514Z"
   }
 }

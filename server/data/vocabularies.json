@@ -7,27 +7,33 @@
     "unit": "第一单元",
     "lesson": "第一课",
     "words": [
-      "你好",
-      "未来",
-      "爷爷"
+      "观潮",
+      "据说",
+      "河堤",
+      "宽阔"
     ],
     "createdAt": "2026-03-01T07:10:05.496Z",
-    "updatedAt": "2026-03-01T08:18:11.825Z",
+    "updatedAt": "2026-03-01T13:36:40.800Z",
     "wordAudios": [
       {
-        "word": "你好",
-        "audioFileName": "440ee0853ad1e99f.wav",
-        "audioRelativePath": "data/audio/440ee0853ad1e99f.wav"
+        "word": "观潮",
+        "audioFileName": "ded9444d63d23d27.wav",
+        "audioRelativePath": "data/audio/ded9444d63d23d27.wav"
       },
       {
-        "word": "未来",
-        "audioFileName": "48595908a409cc0a.wav",
-        "audioRelativePath": "data/audio/48595908a409cc0a.wav"
+        "word": "据说",
+        "audioFileName": "7eab8dcab130a1da.wav",
+        "audioRelativePath": "data/audio/7eab8dcab130a1da.wav"
       },
       {
-        "word": "爷爷",
-        "audioFileName": "bf795b2847d7213e.wav",
-        "audioRelativePath": "data/audio/bf795b2847d7213e.wav"
+        "word": "河堤",
+        "audioFileName": "0db9b24b9983ec04.wav",
+        "audioRelativePath": "data/audio/0db9b24b9983ec04.wav"
+      },
+      {
+        "word": "宽阔",
+        "audioFileName": "ea5b4074592081b9.wav",
+        "audioRelativePath": "data/audio/ea5b4074592081b9.wav"
       }
     ]
   }

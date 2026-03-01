@@ -28,6 +28,11 @@ type ClientBookTreeResponse = {
   items: BookGrade[];
 };
 
+export type RegenerateAudioOptions = {
+  voice?: "tongtong" | "chuichui" | "xiaochen" | "jam" | "kazi" | "douji" | "luodo";
+  speed?: number;
+};
+
 async function parseResponse<T>(response: Response): Promise<T> {
   const json = await response.json();
 
@@ -95,6 +100,24 @@ export async function deleteVocabulary(id: string): Promise<void> {
     method: "DELETE",
   });
   await parseResponse<{ deleted: boolean }>(response);
+}
+
+export async function regenerateVocabularyAudio(
+  id: string,
+  word: string,
+  options?: RegenerateAudioOptions,
+): Promise<VocabularyBook> {
+  const response = await fetch(`/api/vocabularies/${id}/audio/regenerate`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      word,
+      voice: options?.voice,
+      speed: options?.speed,
+    }),
+  });
+  const data = await parseResponse<ItemResponse>(response);
+  return data.item;
 }
 
 export async function fetchDictationData(vocabularyId: string): Promise<DictationData> {

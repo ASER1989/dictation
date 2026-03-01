@@ -90,6 +90,37 @@
     color #68839c
     font-size 14px
 
+  .audio-regenerate-config
+    margin-top 12px
+    display flex
+    gap 12px
+    flex-wrap wrap
+    background #f5faff
+    border 1px solid #e1ecf8
+    border-radius 10px
+    padding 10px
+
+  .audio-config-item
+    display flex
+    align-items center
+    gap 8px
+
+    label
+      color #466381
+      font-size 13px
+
+    select,input
+      height 30px
+      border 1px solid #d3dfed
+      border-radius 8px
+      padding 0 8px
+      font-size 13px
+      outline none
+      background #fcfdff
+
+      &:focus
+        border-color #3388db
+
   .list-wrap
     margin-top 12px
     display flex
@@ -121,12 +152,47 @@
     font-size 13px
     color #58718a
 
-  .item-words
+  .item-words-summary
     margin-top 6px
     color #36516d
     font-size 13px
     line-height 1.5
     word-break break-all
+
+  .item-word-list
+    margin-top 8px
+    display flex
+    flex-direction column
+    gap 6px
+
+  .item-word-empty
+    color #7a8fa3
+    font-size 13px
+
+  .word-row
+    display flex
+    align-items center
+    justify-content space-between
+    gap 8px
+    background #f6faff
+    border 1px solid #e2edf8
+    border-radius 8px
+    padding 6px 8px
+
+  .word-label
+    color #2d4a68
+    font-size 13px
+    word-break break-all
+
+  .word-actions
+    display flex
+    gap 6px
+    flex-shrink 0
+
+    .button
+      font-size 12px
+      padding 3px 10px
+      border-radius 14px
 
   .item-actions
     display flex
@@ -161,3 +227,6 @@
     .item-actions
       align-self stretch
       justify-content flex-end
+
+    .audio-regenerate-config
+      flex-direction column

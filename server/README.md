@@ -18,6 +18,7 @@
 - `POST /api/vocabularies`：新建词汇表（会为每个词生成音频并缓存）
 - `PUT /api/vocabularies/:id`：更新词汇表（新增词会生成音频，已有词复用缓存）
 - `DELETE /api/vocabularies/:id`：删除词汇表
+- `POST /api/vocabularies/:id/audio/regenerate`：按词重新生成语音（body: `{ "word": "词汇", "voice": "tongtong|chuichui|xiaochen|jam|kazi|douji|luodo", "speed": 1.0 }`，`speed` 范围 `0.5~2`）
 
 ## Client 听写接口
 

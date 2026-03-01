@@ -97,7 +97,7 @@ export default function DictationPage() {
         resolve();
       };
 
-      const timeoutId = window.setTimeout(complete, 6000);
+      const timeoutId = window.setTimeout(complete, 5000);
 
       try {
         window.speechSynthesis.cancel();
