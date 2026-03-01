@@ -1,0 +1,20 @@
+{
+  "你好": {
+    "word": "你好",
+    "audioFileName": "440ee0853ad1e99f.wav",
+    "audioRelativePath": "data/audio/440ee0853ad1e99f.wav",
+    "updatedAt": "2026-03-01T08:18:10.091Z"
+  },
+  "未来": {
+    "word": "未来",
+    "audioFileName": "48595908a409cc0a.wav",
+    "audioRelativePath": "data/audio/48595908a409cc0a.wav",
+    "updatedAt": "2026-03-01T08:18:10.875Z"
+  },
+  "爷爷": {
+    "word": "爷爷",
+    "audioFileName": "bf795b2847d7213e.wav",
+    "audioRelativePath": "data/audio/bf795b2847d7213e.wav",
+    "updatedAt": "2026-03-01T08:18:11.824Z"
+  }
+}

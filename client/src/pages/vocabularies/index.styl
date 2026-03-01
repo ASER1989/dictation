@@ -1,0 +1,163 @@
+.vocab-page
+  min-height 100%
+  padding 20px
+  box-sizing border-box
+  background linear-gradient(145deg, #f3f8ff 0%, #f0faf3 100%)
+
+  .vocab-layout
+    max-width 1240px
+    margin 0 auto
+    display grid
+    grid-template-columns 1.15fr 1fr
+    gap 18px
+
+  .vocab-panel
+    background #fff
+    border 1px solid #e7eef7
+    border-radius 14px
+    box-shadow 0 8px 20px rgba(22, 66, 120, .08)
+    padding 18px
+    box-sizing border-box
+
+  .panel-head
+    display flex
+    justify-content space-between
+    align-items center
+    gap 12px
+
+  .panel-title
+    font-size 20px
+    font-weight 700
+    color #1e3855
+
+  .form-field
+    margin-top 14px
+    display flex
+    flex-direction column
+    gap 8px
+
+    label
+      color #3d5975
+      font-size 14px
+
+    input
+      height 36px
+      border 1px solid #d3dfed
+      border-radius 8px
+      padding 0 10px
+      font-size 14px
+      outline none
+      background #fcfdff
+
+      &:focus
+        border-color #3388db
+
+    .textarea
+      border-radius 8px
+      min-height 120px
+
+  .form-grid
+    display grid
+    grid-template-columns repeat(2, minmax(0, 1fr))
+    gap 12px
+    margin-top 4px
+
+    .form-field
+      margin-top 10px
+
+  .form-actions
+    margin-top 16px
+    display flex
+    gap 10px
+    justify-content flex-end
+
+  .error-message
+    margin-top 12px
+    border-radius 8px
+    background #fff2f2
+    color #b53c3c
+    border 1px solid #ffdddd
+    padding 8px 10px
+    font-size 13px
+
+  .list-panel
+    display flex
+    flex-direction column
+    min-height 320px
+
+  .list-tip
+    margin-top 16px
+    color #68839c
+    font-size 14px
+
+  .list-wrap
+    margin-top 12px
+    display flex
+    flex-direction column
+    gap 10px
+    max-height calc(100vh - 180px)
+    overflow auto
+    padding-right 4px
+
+  .list-item
+    display flex
+    justify-content space-between
+    gap 10px
+    border 1px solid #e8eef6
+    border-radius 10px
+    padding 12px
+    background #fbfdff
+
+  .item-main
+    min-width 0
+
+  .item-title
+    font-size 16px
+    font-weight 700
+    color #1f3856
+
+  .item-meta
+    margin-top 5px
+    font-size 13px
+    color #58718a
+
+  .item-words
+    margin-top 6px
+    color #36516d
+    font-size 13px
+    line-height 1.5
+    word-break break-all
+
+  .item-actions
+    display flex
+    gap 8px
+    flex-shrink 0
+    align-self flex-start
+
+@media screen and (max-width: 1024px)
+  .vocab-page
+    .vocab-layout
+      grid-template-columns 1fr
+
+    .list-wrap
+      max-height none
+
+@media screen and (max-width: 640px)
+  .vocab-page
+    padding 12px
+
+    .vocab-panel
+      padding 14px
+
+    .panel-title
+      font-size 18px
+
+    .form-grid
+      grid-template-columns 1fr
+
+    .list-item
+      flex-direction column
+
+    .item-actions
+      align-self stretch
+      justify-content flex-end

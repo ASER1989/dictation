@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1772349005498-7zl2v0v8",
+    "name": "四年级下",
+    "grade": "四年级",
+    "version": "人教版语文",
+    "unit": "第一单元",
+    "lesson": "第一课",
+    "words": [
+      "你好",
+      "未来",
+      "爷爷"
+    ],
+    "createdAt": "2026-03-01T07:10:05.496Z",
+    "updatedAt": "2026-03-01T08:18:11.825Z",
+    "wordAudios": [
+      {
+        "word": "你好",
+        "audioFileName": "440ee0853ad1e99f.wav",
+        "audioRelativePath": "data/audio/440ee0853ad1e99f.wav"
+      },
+      {
+        "word": "未来",
+        "audioFileName": "48595908a409cc0a.wav",
+        "audioRelativePath": "data/audio/48595908a409cc0a.wav"
+      },
+      {
+        "word": "爷爷",
+        "audioFileName": "bf795b2847d7213e.wav",
+        "audioRelativePath": "data/audio/bf795b2847d7213e.wav"
+      }
+    ]
+  }
+]

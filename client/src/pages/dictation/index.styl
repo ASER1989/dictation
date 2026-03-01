@@ -1,0 +1,119 @@
+.dictation-page
+  min-height 100%
+  display flex
+  align-items center
+  justify-content center
+  padding 28px
+  box-sizing border-box
+  background radial-gradient(circle at 10% 10%, #dfefff 0%, #edf7ff 35%, #eef9f0 100%)
+
+  .dictation-board
+    display flex
+    flex-direction column
+    gap 14px
+    align-items center
+
+  .dictation-progress
+    background rgba(255, 255, 255, 0.82)
+    border 1px solid #dbe9f8
+    color #2e4d70
+    font-size 18px
+    font-weight 600
+    padding 10px 18px
+    border-radius 24px
+    box-shadow 0 8px 18px rgba(26, 78, 140, 0.12)
+
+  .dictation-actions
+    display flex
+    gap 24px
+    align-items center
+    justify-content center
+    background linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(245, 250, 255, 0.94))
+    border 1px solid #deebf8
+    border-radius 28px
+    padding 30px 34px
+    box-shadow 0 16px 36px rgba(26, 78, 140, 0.14)
+
+    .dictation-btn
+      .button
+        width 112px
+        height 112px
+        border-radius 56px
+        padding 0
+        font-size 24px
+        font-weight 700
+        letter-spacing 1px
+        box-shadow 0 9px 20px rgba(28, 72, 118, 0.2)
+        transition transform .18s ease, box-shadow .18s ease, filter .18s ease
+        -webkit-tap-highlight-color transparent
+
+        &:active
+          transform scale(0.97)
+          box-shadow 0 4px 12px rgba(28, 72, 118, 0.25)
+
+        &.disabeld
+          opacity .55
+          filter saturate(0.4)
+          box-shadow 0 4px 10px rgba(28, 72, 118, 0.16)
+
+    .dictation-btn-pause
+      .button
+        width 164px
+        border-radius 82px
+        font-size 26px
+        box-shadow 0 11px 24px rgba(0, 122, 193, 0.3)
+
+@media screen and (min-width: 768px) and (max-width: 1200px)
+  .dictation-page
+    .dictation-progress
+      font-size 17px
+
+    .dictation-actions
+      padding 28px 30px
+      gap 20px
+
+      .dictation-btn
+        .button
+          width 108px
+          height 108px
+          border-radius 54px
+          font-size 22px
+
+      .dictation-btn-pause
+        .button
+          width 156px
+          border-radius 78px
+          font-size 24px
+
+@media screen and (max-width: 640px)
+  .dictation-page
+    padding 16px
+
+    .dictation-board
+      width 100%
+
+    .dictation-progress
+      width 100%
+      box-sizing border-box
+      text-align center
+      font-size 15px
+
+    .dictation-actions
+      width 100%
+      justify-content space-around
+      gap 10px
+      padding 16px 14px
+      border-radius 20px
+
+      .dictation-btn
+        .button
+          width 86px
+          height 86px
+          border-radius 43px
+          font-size 18px
+
+      .dictation-btn-pause
+        .button
+          width 122px
+          border-radius 61px
+          font-size 20px

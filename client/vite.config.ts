@@ -20,6 +20,12 @@ export default defineConfig(({ command, mode }) => {
       port: 2413,
       strictPort: true,
       hmr: true,
+      proxy: {
+        "/api": {
+          target: "http://localhost:3000",
+          changeOrigin: true,
+        },
+      },
     },
     esbuild: {
       pure: ["console.log"],
