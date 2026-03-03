@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dictation
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dictation
+  template:
+    metadata:
+      labels:
+        app: dictation
+    spec:
+      containers:
+        - name:  dictation
+          image: registry.cn-hangzhou.aliyuncs.com/aser/dictation:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: IS_READONLY
+              value: "true"
+            - name: PORT
+              value: "80"
+      imagePullSecrets:
+        - name: aliyun-registry-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dictation-service
+  namespace: default
+spec:
+  selector:
+    app: dictation
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: dictation-cert
+  namespace: default
+spec:
+  secretName: dictation-cert  # Traefik 会用这个 secret 提供 HTTPS
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: dic.aser1989.cn
+  dnsNames:
+    - dic.aser1989.cn
+  usages:
+    - digital signature
+    - key encipherment
+  privateKey:
+    algorithm: RSA
+    size: 2048
+
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dictation-ingress
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`dic.aser1989.cn`)
+      kind: Rule
+      services:
+        - name: dictation-service
+          port: 80
+      middlewares:
+        - name: cache-control
+        - name: compress-middleware
+  tls:
+    secretName: dictation-cert

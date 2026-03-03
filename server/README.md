@@ -6,6 +6,7 @@
 
 - `BIGMODEL_API_KEY`：智谱语音 API Key（录入词汇时生成音频必填）
 - `DATA_DIR`：词汇与音频数据目录，默认 `./data`（建议部署时配置为数据卷挂载目录）
+- `FRONTEND_DIST_DIR`：前端静态资源目录，默认 `../client/dist`
 - `BIGMODEL_TTS_URL`：语音接口地址，默认 `https://open.bigmodel.cn/api/paas/v4/audio/speech`
 - `BIGMODEL_TTS_MODEL`：默认 `glm-tts`
 - `BIGMODEL_TTS_VOICE`：默认 `female`
@@ -27,6 +28,11 @@
 - `GET /api/client/vocabularies`：返回可用于客户端词汇本选择的数据
 - `GET /api/client/vocabularies/:id/dictation`：返回听写词汇与音频 URL，并附带 `repeatTimes=3`、`intervalSeconds=10`
 - `GET /api/client/audio/:fileName`：读取本地词汇音频文件
+
+## 前端访问
+
+- `server` 会代理非 `/api/*` 的 GET/HEAD 请求到 `FRONTEND_DIST_DIR`。
+- 当请求路径不是静态文件时，自动回退到 `index.html`，可直接通过域名访问前端页面。
 
 ## 音频存储
 

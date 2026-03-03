@@ -1,0 +1,13 @@
+.git
+.github
+.idea
+.pnpm-store
+.qoder
+
+node_modules
+**/node_modules
+
+server/.tscache
+
+.DS_Store
+*.log

@@ -1,0 +1,56 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: registry.cn-hangzhou.aliyuncs.com/aser/dictation
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: |
+          npm --prefix client install
+          npm --prefix server ci
+
+      - name: Build Client and Server
+        run: |
+          npm --prefix client run build:client
+          npm --prefix server run build
+
+      - name: Get Version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Package Version: $VERSION"
+
+      - name: Login to Aliyun Docker Registry
+        run: |
+          echo "${{ secrets.ALIYUN_DOCKER_PASSWORD }}" | docker login registry.cn-hangzhou.aliyuncs.com -u "${{ secrets.ALIYUN_DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -t "${IMAGE_NAME}:${VERSION}" \
+            -t "${IMAGE_NAME}:latest" \
+            .
+
+      - name: Push Docker Image
+        run: |
+          docker push "${IMAGE_NAME}:${VERSION}"
+          docker push "${IMAGE_NAME}:latest"

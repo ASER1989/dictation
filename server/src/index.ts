@@ -1,5 +1,7 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
+import { envConfig } from './config/env';
+import { useFrontendProxy } from './middlewares/frontendProxy';
 import { useResponseFormatter } from './middlewares/responseFormatter';
 import helloRouters from './routes/hello';
 import vocabularyRouters from './routes/vocabularies';
@@ -17,7 +19,8 @@ app
   .use(useResponseFormatter())
   .use(helloRouters('/api'))
   .use(vocabularyRouters('/api'))
-  .use(clientVocabularyRouters('/api'));
+  .use(clientVocabularyRouters('/api'))
+  .use(useFrontendProxy(envConfig.frontendDistDirPath));
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

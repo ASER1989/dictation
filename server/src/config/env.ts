@@ -52,9 +52,14 @@ function resolveDirectoryPath(value: string | undefined, fallback: string): stri
 }
 
 const defaultDataDirPath = fileURLToPath(new URL('../data', import.meta.url));
+const defaultFrontendDistDirPath = fileURLToPath(new URL('../../client/dist', import.meta.url));
 
 export const envConfig = {
   dataDirPath: resolveDirectoryPath(process.env.DATA_DIR, defaultDataDirPath),
+  frontendDistDirPath: resolveDirectoryPath(
+    process.env.FRONTEND_DIST_DIR,
+    defaultFrontendDistDirPath
+  ),
   bigModelApiKey: process.env.BIGMODEL_API_KEY ?? '',
   bigModelTtsUrl:
     process.env.BIGMODEL_TTS_URL ?? 'https://open.bigmodel.cn/api/paas/v4/audio/speech',
