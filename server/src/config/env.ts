@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'fs';
+import path from 'path';
 import { fileURLToPath } from 'url';
 
 const envFilePath = fileURLToPath(new URL('../.env', import.meta.url));
@@ -36,7 +37,24 @@ function parseNumber(value: string | undefined, fallback: number): number {
   return fallback;
 }
 
+function resolveDirectoryPath(value: string | undefined, fallback: string): string {
+  const normalized = value?.trim();
+
+  if (!normalized) {
+    return fallback;
+  }
+
+  if (path.isAbsolute(normalized)) {
+    return normalized;
+  }
+
+  return path.resolve(process.cwd(), normalized);
+}
+
+const defaultDataDirPath = fileURLToPath(new URL('../data', import.meta.url));
+
 export const envConfig = {
+  dataDirPath: resolveDirectoryPath(process.env.DATA_DIR, defaultDataDirPath),
   bigModelApiKey: process.env.BIGMODEL_API_KEY ?? '',
   bigModelTtsUrl:
     process.env.BIGMODEL_TTS_URL ?? 'https://open.bigmodel.cn/api/paas/v4/audio/speech',

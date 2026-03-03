@@ -2,7 +2,6 @@ import { createHash } from 'crypto';
 import { constants } from 'fs';
 import { access, mkdir, readFile, writeFile } from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { envConfig } from '../config/env';
 import type { WordAudioItem } from '../types/vocabulary';
 
@@ -31,7 +30,7 @@ type WordAudioCache = Record<
   }
 >;
 
-const dataDirPath = fileURLToPath(new URL('../data', import.meta.url));
+const dataDirPath = envConfig.dataDirPath;
 const audioDirPath = path.join(dataDirPath, 'audio');
 const audioMapFilePath = path.join(dataDirPath, 'wordAudioMap.json');
 

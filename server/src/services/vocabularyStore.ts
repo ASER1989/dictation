@@ -1,11 +1,10 @@
 import { mkdir, readFile, writeFile } from 'fs/promises';
-import { fileURLToPath } from 'url';
 import path from 'path';
+import { envConfig } from '../config/env';
 import { ensureWordAudios, regenerateWordAudio, type TtsRegenerateOptions } from './ttsStore';
 import type { VocabularyBook, VocabularyBookInput, WordAudioItem } from '../types/vocabulary';
 
-const dataFilePath = new URL('../data/vocabularies.json', import.meta.url);
-const dataFilePathname = fileURLToPath(dataFilePath);
+const dataFilePathname = path.join(envConfig.dataDirPath, 'vocabularies.json');
 
 function normalizeWords(words?: string[]): string[] {
   if (!Array.isArray(words)) {

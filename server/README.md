@@ -5,6 +5,7 @@
 复制 `.env.example` 并设置以下变量（或在启动前通过 shell 导出）：
 
 - `BIGMODEL_API_KEY`：智谱语音 API Key（录入词汇时生成音频必填）
+- `DATA_DIR`：词汇与音频数据目录，默认 `./data`（建议部署时配置为数据卷挂载目录）
 - `BIGMODEL_TTS_URL`：语音接口地址，默认 `https://open.bigmodel.cn/api/paas/v4/audio/speech`
 - `BIGMODEL_TTS_MODEL`：默认 `glm-tts`
 - `BIGMODEL_TTS_VOICE`：默认 `female`
@@ -29,7 +30,8 @@
 
 ## 音频存储
 
-- 词汇音频文件：`server/data/audio/*.wav`
-- 词汇与音频映射：`server/data/wordAudioMap.json`
+- 词汇音频文件：`${DATA_DIR}/audio/*.wav`
+- 词汇与音频映射：`${DATA_DIR}/wordAudioMap.json`
+- 词汇表数据：`${DATA_DIR}/vocabularies.json`
 
 同一词汇在请求前会先检查映射和音频文件，命中后不会重复调用外部语音接口。
