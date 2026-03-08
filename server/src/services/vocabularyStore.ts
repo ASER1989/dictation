@@ -16,6 +16,69 @@ function normalizeWords(words?: string[]): string[] {
     .filter((item) => item.length > 0);
 }
 
+function normalizeWordAudioItems(input: unknown): WordAudioItem[] {
+  if (!Array.isArray(input)) {
+    return [];
+  }
+
+  return input
+    .map((item) => {
+      if (!item || typeof item !== 'object') {
+        return null;
+      }
+
+      const source = item as Record<string, unknown>;
+      const word = typeof source.word === 'string' ? source.word.trim() : '';
+      const audioFileName =
+        typeof source.audioFileName === 'string' ? source.audioFileName.trim() : '';
+      const audioRelativePath =
+        typeof source.audioRelativePath === 'string' ? source.audioRelativePath.trim() : '';
+
+      if (!word || !audioFileName || !audioRelativePath) {
+        return null;
+      }
+
+      return {
+        word,
+        audioFileName,
+        audioRelativePath,
+      };
+    })
+    .filter((item): item is WordAudioItem => Boolean(item));
+}
+
+function normalizeVocabularyBook(item: unknown): VocabularyBook | null {
+  if (!item || typeof item !== 'object') {
+    return null;
+  }
+
+  const source = item as Record<string, unknown>;
+  const id = typeof source.id === 'string' ? source.id.trim() : '';
+  const name = typeof source.name === 'string' ? source.name.trim() : '';
+
+  if (!id || !name) {
+    return null;
+  }
+
+  const unit = typeof source.unit === 'string' ? source.unit.trim() : '';
+  const lesson = typeof source.lesson === 'string' ? source.lesson.trim() : '';
+  const words = normalizeWords(source.words as string[] | undefined);
+  const wordAudios = normalizeWordAudioItems(source.wordAudios);
+  const createdAt = typeof source.createdAt === 'string' ? source.createdAt : '';
+  const updatedAt = typeof source.updatedAt === 'string' ? source.updatedAt : '';
+
+  return {
+    id,
+    name,
+    unit,
+    lesson,
+    words,
+    wordAudios,
+    createdAt: createdAt || new Date().toISOString(),
+    updatedAt: updatedAt || createdAt || new Date().toISOString(),
+  };
+}
+
 async function ensureDataFile() {
   const filePath = dataFilePathname;
   const dirPath = path.dirname(filePath);
@@ -37,8 +100,13 @@ export async function getVocabularyBooks(): Promise<VocabularyBook[]> {
   }
 
   try {
-    const parsed = JSON.parse(content) as VocabularyBook[];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(content) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed
+      .map((item) => normalizeVocabularyBook(item))
+      .filter((item): item is VocabularyBook => Boolean(item));
   } catch {
     return [];
   }
@@ -61,8 +129,6 @@ export async function createVocabularyBook(input: VocabularyBookInput): Promise<
   const newBook: VocabularyBook = {
     id: createId(),
     name: input.name.trim(),
-    grade: input.grade.trim(),
-    version: input.version.trim(),
     unit: input.unit.trim(),
     lesson: (input.lesson ?? '').trim(),
     words: normalizedWords,
@@ -111,8 +177,6 @@ export async function updateVocabularyBook(
   const normalizedWords = normalizeWords(input.words);
   const wordAudios = await ensureWordAudios(normalizedWords);
   target.name = input.name.trim();
-  target.grade = input.grade.trim();
-  target.version = input.version.trim();
   target.unit = input.unit.trim();
   target.lesson = (input.lesson ?? '').trim();
   target.words = normalizedWords;

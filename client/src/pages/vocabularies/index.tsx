@@ -15,8 +15,6 @@ import "./index.styl";
 
 type FormState = {
   name: string;
-  grade: string;
-  version: string;
   unit: string;
   lesson: string;
   wordsText: string;
@@ -24,8 +22,6 @@ type FormState = {
 
 const defaultFormState: FormState = {
   name: "",
-  grade: "",
-  version: "",
   unit: "",
   lesson: "",
   wordsText: "",
@@ -58,8 +54,6 @@ function parseWords(input: string): string[] {
 function toPayload(form: FormState): VocabularyBookPayload {
   return {
     name: form.name.trim(),
-    grade: form.grade.trim(),
-    version: form.version.trim(),
     unit: form.unit.trim(),
     lesson: form.lesson.trim(),
     words: parseWords(form.wordsText),
@@ -69,12 +63,6 @@ function toPayload(form: FormState): VocabularyBookPayload {
 function validateForm(payload: VocabularyBookPayload): string | null {
   if (!payload.name) {
     return "请填写词汇表名称";
-  }
-  if (!payload.grade) {
-    return "请填写年级";
-  }
-  if (!payload.version) {
-    return "请填写版本";
   }
   if (!payload.unit) {
     return "请填写课程单元";
@@ -151,8 +139,6 @@ export default function VocabulariesPage() {
     setEditingId(item.id);
     setForm({
       name: item.name,
-      grade: item.grade,
-      version: item.version,
       unit: item.unit,
       lesson: item.lesson,
       wordsText: wordsToText(item.words),
@@ -287,27 +273,11 @@ export default function VocabulariesPage() {
             <input
               value={form.name}
               onChange={(event) => handleInputChange("name", event.target.value)}
-              placeholder="例如：一年级上 人教版 第一单元"
+              placeholder="例如：第一单元 第1课"
             />
           </div>
 
           <div className="form-grid">
-            <div className="form-field">
-              <label>年级</label>
-              <input
-                value={form.grade}
-                onChange={(event) => handleInputChange("grade", event.target.value)}
-                placeholder="例如：一年级上"
-              />
-            </div>
-            <div className="form-field">
-              <label>版本</label>
-              <input
-                value={form.version}
-                onChange={(event) => handleInputChange("version", event.target.value)}
-                placeholder="例如：人教版语文"
-              />
-            </div>
             <div className="form-field">
               <label>课程单元</label>
               <input
@@ -388,7 +358,7 @@ export default function VocabulariesPage() {
                   <div className="item-main">
                     <div className="item-title">{item.name}</div>
                     <div className="item-meta">
-                      {item.grade} / {item.version} / {item.unit}
+                      {item.unit}
                       {item.lesson ? ` / ${item.lesson}` : ""}
                     </div>
                     <div className="item-words-summary">词汇数量：{item.words.length}</div>

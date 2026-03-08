@@ -14,8 +14,6 @@ function isValidRouteState(state: unknown): state is DictationRouteState {
   const routeState = state as DictationRouteState;
   return (
     !!routeState.selection &&
-    typeof routeState.selection.gradeId === "string" &&
-    typeof routeState.selection.versionId === "string" &&
     typeof routeState.selection.unitId === "string" &&
     typeof routeState.selection.lessonId === "string" &&
     typeof routeState.vocabularyId === "string"
@@ -29,7 +27,7 @@ export default function DictationPage() {
   const [isPreparing, setIsPreparing] = useState(false);
   const [dictationWords, setDictationWords] = useState<DictationWordItem[]>([]);
   const [repeatTimes, setRepeatTimes] = useState(3);
-  const [intervalSeconds, setIntervalSeconds] = useState(6);
+  const [intervalSeconds, setIntervalSeconds] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<number | null>(null);

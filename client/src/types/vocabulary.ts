@@ -1,8 +1,6 @@
 export type VocabularyBook = {
   id: string;
   name: string;
-  grade: string;
-  version: string;
   unit: string;
   lesson: string;
   words: string[];
@@ -19,8 +17,6 @@ export type WordAudioItem = {
 
 export type VocabularyBookPayload = {
   name: string;
-  grade: string;
-  version: string;
   unit: string;
   lesson: string;
   words: string[];
@@ -29,8 +25,6 @@ export type VocabularyBookPayload = {
 export type ClientVocabularyItem = {
   id: string;
   name: string;
-  grade: string;
-  version: string;
   unit: string;
   lesson: string;
   wordCount: number;
@@ -45,8 +39,6 @@ export type DictationData = {
   book: {
     id: string;
     name: string;
-    grade: string;
-    version: string;
     unit: string;
     lesson: string;
   };

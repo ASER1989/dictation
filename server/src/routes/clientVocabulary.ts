@@ -32,72 +32,39 @@ export default (prefix: string) => {
 
   router.get('/client/books/tree', async (ctx: Context) => {
     const books = await getVocabularyBooks();
-    const gradeMap = new Map<
+    const unitMap = new Map<
       string,
       {
         id: string;
         name: string;
-        versions: Array<{
+        lessons: Array<{
           id: string;
           name: string;
-          units: Array<{
-            id: string;
-            name: string;
-            lessons: Array<{
-              id: string;
-              name: string;
-              vocabularyId: string;
-              wordCount: number;
-            }>;
-          }>;
+          vocabularyId: string;
+          wordCount: number;
         }>;
       }
     >();
 
     books.forEach((item) => {
-      const gradeName = item.grade.trim();
-      const versionName = item.version.trim();
       const unitName = item.unit.trim();
       const lessonName = item.lesson.trim() || item.name.trim();
 
-      if (!gradeName || !versionName || !unitName || !lessonName || item.words.length === 0) {
+      if (!unitName || !lessonName || item.words.length === 0) {
         return;
       }
 
-      const gradeId = formatId('grade', gradeName);
-      const versionId = formatId('version', `${gradeName}-${versionName}`);
-      const unitId = formatId('unit', `${gradeName}-${versionName}-${unitName}`);
+      const unitId = formatId('unit', unitName);
 
-      if (!gradeMap.has(gradeId)) {
-        gradeMap.set(gradeId, {
-          id: gradeId,
-          name: gradeName,
-          versions: [],
-        });
-      }
-
-      const grade = gradeMap.get(gradeId)!;
-
-      let version = grade.versions.find((versionItem) => versionItem.id === versionId);
-      if (!version) {
-        version = {
-          id: versionId,
-          name: versionName,
-          units: [],
-        };
-        grade.versions.push(version);
-      }
-
-      let unit = version.units.find((unitItem) => unitItem.id === unitId);
-      if (!unit) {
-        unit = {
+      if (!unitMap.has(unitId)) {
+        unitMap.set(unitId, {
           id: unitId,
           name: unitName,
           lessons: [],
-        };
-        version.units.push(unit);
+        });
       }
 
+      const unit = unitMap.get(unitId)!;
       unit.lessons.push({
         id: item.id,
         name: lessonName,
@@ -106,7 +73,7 @@ export default (prefix: string) => {
       });
     });
 
-    return {items: Array.from(gradeMap.values())};
+    return {items: Array.from(unitMap.values())};
   });
 
   router.get('/client/vocabularies', async (ctx: Context) => {
@@ -114,8 +81,6 @@ export default (prefix: string) => {
     const items = books.map((item) => ({
       id: item.id,
       name: item.name,
-      grade: item.grade,
-      version: item.version,
       unit: item.unit,
       lesson: item.lesson,
       wordCount: item.words.length,
@@ -151,8 +116,6 @@ export default (prefix: string) => {
       book: {
         id: target.id,
         name: target.name,
-        grade: target.grade,
-        version: target.version,
         unit: target.unit,
         lesson: target.lesson,
       },

@@ -1,8 +1,6 @@
 export type VocabularyBook = {
   id: string;
   name: string;
-  grade: string;
-  version: string;
   unit: string;
   lesson: string;
   words: string[];
@@ -19,8 +17,6 @@ export type WordAudioItem = {
 
 export type VocabularyBookInput = {
   name: string;
-  grade: string;
-  version: string;
   unit: string;
   lesson?: string;
   words?: string[];

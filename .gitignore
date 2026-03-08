@@ -38,3 +38,5 @@ eslint-output.*
 .webpack-cache/
 
 **/dist
+
+server/data

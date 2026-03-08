@@ -1,40 +1,32 @@
 [
   {
-    "id": "1772349005498-7zl2v0v8",
-    "name": "四年级下",
-    "grade": "四年级",
-    "version": "人教版语文",
+    "id": "1772961665962-slkz6x33",
+    "name": "四年级上",
     "unit": "第一单元",
     "lesson": "第一课",
     "words": [
-      "观潮",
-      "据说",
-      "河堤",
-      "宽阔"
+      "金碧辉煌",
+      "碧波荡漾",
+      "编辑，他编辑了一本书"
     ],
-    "createdAt": "2026-03-01T07:10:05.496Z",
-    "updatedAt": "2026-03-01T13:36:40.800Z",
     "wordAudios": [
       {
-        "word": "观潮",
-        "audioFileName": "ded9444d63d23d27.wav",
-        "audioRelativePath": "data/audio/ded9444d63d23d27.wav"
+        "word": "金碧辉煌",
+        "audioFileName": "163b45eeb8b6bcce.wav",
+        "audioRelativePath": "data/audio/163b45eeb8b6bcce.wav"
       },
       {
-        "word": "据说",
-        "audioFileName": "7eab8dcab130a1da.wav",
-        "audioRelativePath": "data/audio/7eab8dcab130a1da.wav"
+        "word": "碧波荡漾",
+        "audioFileName": "6ebd1bd57cb51890.wav",
+        "audioRelativePath": "data/audio/6ebd1bd57cb51890.wav"
       },
       {
-        "word": "河堤",
-        "audioFileName": "0db9b24b9983ec04.wav",
-        "audioRelativePath": "data/audio/0db9b24b9983ec04.wav"
-      },
-      {
-        "word": "宽阔",
-        "audioFileName": "ea5b4074592081b9.wav",
-        "audioRelativePath": "data/audio/ea5b4074592081b9.wav"
+        "word": "编辑，他编辑了一本书",
+        "audioFileName": "25c3e9fcb1e56d29.wav",
+        "audioRelativePath": "data/audio/25c3e9fcb1e56d29.wav"
       }
-    ]
+    ],
+    "createdAt": "2026-03-08T09:21:04.720Z",
+    "updatedAt": "2026-03-08T09:31:54.090Z"
   }
 ]

@@ -40,5 +40,35 @@
     "audioFileName": "ea5b4074592081b9.wav",
     "audioRelativePath": "data/audio/ea5b4074592081b9.wav",
     "updatedAt": "2026-03-01T11:17:19.514Z"
+  },
+  "金碧辉煌": {
+    "word": "金碧辉煌",
+    "audioFileName": "163b45eeb8b6bcce.wav",
+    "audioRelativePath": "data/audio/163b45eeb8b6bcce.wav",
+    "updatedAt": "2026-03-08T09:28:04.690Z"
+  },
+  "碧波荡漾": {
+    "word": "碧波荡漾",
+    "audioFileName": "6ebd1bd57cb51890.wav",
+    "audioRelativePath": "data/audio/6ebd1bd57cb51890.wav",
+    "updatedAt": "2026-03-08T09:28:21.380Z"
+  },
+  "编辑": {
+    "word": "编辑",
+    "audioFileName": "a7f814c0a40db7fd.wav",
+    "audioRelativePath": "data/audio/a7f814c0a40db7fd.wav",
+    "updatedAt": "2026-03-08T09:30:36.967Z"
+  },
+  "编辑 他编辑了一本书": {
+    "word": "编辑 他编辑了一本书",
+    "audioFileName": "a6815565531a8e02.wav",
+    "audioRelativePath": "data/audio/a6815565531a8e02.wav",
+    "updatedAt": "2026-03-08T09:31:17.415Z"
+  },
+  "编辑，他编辑了一本书": {
+    "word": "编辑，他编辑了一本书",
+    "audioFileName": "25c3e9fcb1e56d29.wav",
+    "audioRelativePath": "data/audio/25c3e9fcb1e56d29.wav",
+    "updatedAt": "2026-03-08T09:31:54.089Z"
   }
 }

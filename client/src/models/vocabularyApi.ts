@@ -1,4 +1,4 @@
-import type { BookGrade } from "@client/types/books";
+import type { BookUnit } from "@client/types/books";
 import type {
   ClientVocabularyItem,
   DictationData,
@@ -25,7 +25,7 @@ type ClientListResponse = {
 };
 
 type ClientBookTreeResponse = {
-  items: BookGrade[];
+  items: BookUnit[];
 };
 
 export type RegenerateAudioOptions = {
@@ -66,7 +66,7 @@ export async function fetchClientVocabularyBooks(): Promise<ClientVocabularyItem
   return data.items;
 }
 
-export async function fetchClientBooksTree(): Promise<BookGrade[]> {
+export async function fetchClientBooksTree(): Promise<BookUnit[]> {
   const response = await fetch("/api/client/books/tree");
   const data = await parseResponse<ClientBookTreeResponse>(response);
   return data.items;

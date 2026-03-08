@@ -17,8 +17,6 @@ function parseInput(ctx: Context): VocabularyBookInput {
   const body = (ctx.request.body ?? {}) as Record<string, unknown>;
   return {
     name: typeof body.name === 'string' ? body.name : '',
-    grade: typeof body.grade === 'string' ? body.grade : '',
-    version: typeof body.version === 'string' ? body.version : '',
     unit: typeof body.unit === 'string' ? body.unit : '',
     lesson: typeof body.lesson === 'string' ? body.lesson : '',
     words: Array.isArray(body.words)
@@ -30,12 +28,6 @@ function parseInput(ctx: Context): VocabularyBookInput {
 function getValidationError(input: VocabularyBookInput): string | null {
   if (!input.name.trim()) {
     return '词汇表名称不能为空';
-  }
-  if (!input.grade.trim()) {
-    return '年级不能为空';
-  }
-  if (!input.version.trim()) {
-    return '版本不能为空';
   }
   if (!input.unit.trim()) {
     return '课程单元不能为空';
