@@ -24,6 +24,16 @@ spec:
               value: "true"
             - name: PORT
               value: "80"
+          envFrom:
+            - configMapRef:
+                name: dictation-app-config
+          volumeMounts:
+            - name: store
+              mountPath: /data
+      volumes:
+        - name: store
+          persistentVolumeClaim:
+            claimName: dictation-pvc
       imagePullSecrets:
         - name: aliyun-registry-secret
 
