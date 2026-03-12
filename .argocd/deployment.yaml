@@ -98,5 +98,6 @@ spec:
       middlewares:
         - name: cache-control
         - name: compress-middleware
+        - name: https-redirect
   tls:
     secretName: dictation-cert
