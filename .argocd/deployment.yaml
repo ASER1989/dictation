@@ -87,7 +87,6 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-production
 spec:
   entryPoints:
-    - web
     - websecure
   routes:
     - match: Host(`dic.aser1989.cn`)
@@ -98,6 +97,24 @@ spec:
       middlewares:
         - name: cache-control
         - name: compress-middleware
-        - name: https-redirect
   tls:
     secretName: dictation-cert
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dictation-web-ingress
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`dic.aser1989.cn`)
+      kind: Rule
+      services:
+        - name: dictation-service
+          port: 80
+      middlewares:
+        - name: https-redirect
