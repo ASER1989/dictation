@@ -1,6 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Button from "@client/components/button";
+import { useDictationPlayback } from "@client/hooks/useDictationPlayback";
+import { useDictationPreload } from "@client/hooks/useDictationPreload";
 import { fetchDictationData } from "@client/models/vocabularyApi";
 import type { DictationRouteState } from "@client/types/books";
 import type { DictationWordItem } from "@client/types/vocabulary";
@@ -24,125 +26,28 @@ export default function DictationPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [isPreparing, setIsPreparing] = useState(false);
   const [dictationWords, setDictationWords] = useState<DictationWordItem[]>([]);
   const [repeatTimes, setRepeatTimes] = useState(3);
-  const [intervalSeconds, setIntervalSeconds] = useState(1);
+  const [intervalSeconds, setIntervalSeconds] = useState(6);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef<number | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playTaskIdRef = useRef(0);
-  const prepareTaskIdRef = useRef(0);
-  const completionAnnouncedRef = useRef(false);
+
+  const { isPreparing, playPrepareAnnouncement, stopPrepareTask, stopPlaybackTask } =
+    useDictationPlayback({
+      dictationWords,
+      repeatTimes,
+      intervalSeconds,
+      loading,
+      currentIndex,
+      isPaused,
+      setCurrentIndex,
+    });
+
+  const { resetPreload } = useDictationPreload({ dictationWords, currentIndex, loading });
 
   const routeState = useMemo(() => {
     return isValidRouteState(location.state) ? location.state : null;
   }, [location.state]);
-
-  const clearPlayback = useCallback(() => {
-    if (timerRef.current !== null) {
-      window.clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      audioRef.current = null;
-    }
-  }, []);
-
-  const stopPlaybackTask = useCallback(() => {
-    playTaskIdRef.current += 1;
-    clearPlayback();
-  }, [clearPlayback]);
-
-  const stopPrepareTask = useCallback(() => {
-    prepareTaskIdRef.current += 1;
-    setIsPreparing(false);
-    if (typeof window !== "undefined" && "speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-    }
-  }, []);
-
-  const playPrepareAnnouncement = useCallback(async () => {
-    const taskId = ++prepareTaskIdRef.current;
-    setIsPreparing(true);
-
-    const finish = () => {
-      if (taskId === prepareTaskIdRef.current) {
-        setIsPreparing(false);
-      }
-    };
-
-    if (
-      typeof window === "undefined" ||
-      !("speechSynthesis" in window) ||
-      typeof SpeechSynthesisUtterance === "undefined"
-    ) {
-      finish();
-      return;
-    }
-
-    await new Promise<void>((resolve) => {
-      let completed = false;
-      const complete = () => {
-        if (completed) {
-          return;
-        }
-        completed = true;
-        window.clearTimeout(timeoutId);
-        resolve();
-      };
-
-      const timeoutId = window.setTimeout(complete, 5000);
-
-      try {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance("听写即将开始，请准备");
-        utterance.lang = "zh-CN";
-        utterance.rate = 1;
-        utterance.pitch = 1;
-        utterance.volume = 1;
-        utterance.onend = complete;
-        utterance.onerror = complete;
-        window.speechSynthesis.speak(utterance);
-      } catch {
-        complete();
-      }
-    });
-
-    finish();
-  }, []);
-
-  const playCompletionAnnouncement = useCallback(() => {
-    if (completionAnnouncedRef.current) {
-      return;
-    }
-
-    completionAnnouncedRef.current = true;
-
-    if (
-      typeof window === "undefined" ||
-      !("speechSynthesis" in window) ||
-      typeof SpeechSynthesisUtterance === "undefined"
-    ) {
-      return;
-    }
-
-    setCurrentIndex((prevState) => Math.min(prevState + 1, dictationWords.length - 1));
-    try {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance("听写完成，请检查听写情况。");
-      utterance.lang = "zh-CN";
-      utterance.rate = 1;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-      window.speechSynthesis.speak(utterance);
-    } catch {
-      // ignore synthesis errors
-    }
-  }, []);
 
   useEffect(() => {
     if (!routeState) {
@@ -158,9 +63,9 @@ export default function DictationPage() {
     let disposed = false;
     setLoading(true);
     setCurrentIndex(0);
-    completionAnnouncedRef.current = false;
     stopPrepareTask();
     stopPlaybackTask();
+    resetPreload();
 
     const loadDictationWords = async () => {
       try {
@@ -169,8 +74,8 @@ export default function DictationPage() {
           return;
         }
         setDictationWords(data.words);
-        setRepeatTimes(data.repeatTimes);
-        setIntervalSeconds(data.intervalSeconds);
+        // setRepeatTimes(data.repeatTimes);
+        // setIntervalSeconds(data.intervalSeconds);
         setIsPaused(false);
         void playPrepareAnnouncement();
       } catch (error) {
@@ -191,92 +96,15 @@ export default function DictationPage() {
       disposed = true;
       stopPrepareTask();
       stopPlaybackTask();
-    };
-  }, [navigate, playPrepareAnnouncement, routeState, stopPlaybackTask, stopPrepareTask]);
-
-  useEffect(() => {
-    if (currentIndex < Math.max(dictationWords.length - 1, 0)) {
-      completionAnnouncedRef.current = false;
-    }
-  }, [currentIndex, dictationWords.length]);
-
-  useEffect(() => {
-    if (loading || isPaused || isPreparing || dictationWords.length === 0) {
-      return;
-    }
-
-    const currentWord = dictationWords[currentIndex];
-    if (!currentWord) {
-      return;
-    }
-
-    const taskId = ++playTaskIdRef.current;
-    clearPlayback();
-
-    const playByRound = (roundIndex: number) => {
-      if (taskId !== playTaskIdRef.current || isPaused) {
-        return;
-      }
-
-      const audio = new Audio(currentWord.audioUrl);
-      audioRef.current = audio;
-
-      let scheduled = false;
-      const scheduleNextStep = () => {
-        if (scheduled) {
-          return;
-        }
-        scheduled = true;
-
-        if (taskId !== playTaskIdRef.current || isPaused) {
-          return;
-        }
-
-        timerRef.current = window.setTimeout(() => {
-          if (taskId !== playTaskIdRef.current || isPaused) {
-            return;
-          }
-
-          if (roundIndex + 1 < repeatTimes) {
-            playByRound(roundIndex + 1);
-            return;
-          }
-
-          if (currentIndex < dictationWords.length - 1) {
-            setCurrentIndex((prevState) => Math.min(prevState + 1, dictationWords.length - 1));
-            return;
-          }
-
-          playCompletionAnnouncement();
-        }, Math.max(1, intervalSeconds) * 1000);
-      };
-
-      audio.onended = scheduleNextStep;
-      audio.onerror = scheduleNextStep;
-
-      const playPromise = audio.play();
-      if (playPromise && typeof playPromise.catch === "function") {
-        playPromise.catch(() => scheduleNextStep());
-      }
-    };
-
-    playByRound(0);
-
-    return () => {
-      if (taskId === playTaskIdRef.current) {
-        clearPlayback();
-      }
+      resetPreload();
     };
   }, [
-    clearPlayback,
-    currentIndex,
-    dictationWords,
-    intervalSeconds,
-    isPreparing,
-    isPaused,
-    loading,
-    playCompletionAnnouncement,
-    repeatTimes,
+    navigate,
+    playPrepareAnnouncement,
+    routeState,
+    stopPlaybackTask,
+    stopPrepareTask,
+    resetPreload,
   ]);
 
   if (!routeState) {

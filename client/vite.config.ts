@@ -51,5 +51,9 @@ export default defineConfig(({ command, mode }) => {
       sourcemap: command === "serve",
       minify: command === "build",
     },
+    test: {
+      environment: "jsdom",
+      setupFiles: ["./src/test/setup.ts"],
+    },
   };
 });
