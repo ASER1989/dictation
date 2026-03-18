@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, {useEffect, useMemo, useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
 import Button from "@client/components/button";
-import { useDictationPlayback } from "@client/hooks/useDictationPlayback";
-import { useDictationPreload } from "@client/hooks/useDictationPreload";
-import { fetchDictationData } from "@client/models/vocabularyApi";
-import type { DictationRouteState } from "@client/types/books";
-import type { DictationWordItem } from "@client/types/vocabulary";
+import {useDictationPlayback} from "@client/hooks/useDictationPlayback";
+import {useDictationPreload} from "@client/hooks/useDictationPreload";
+import {fetchDictationData} from "@client/models/vocabularyApi";
+import type {DictationRouteState} from "@client/types/books";
+import type {DictationWordItem} from "@client/types/vocabulary";
 import "./index.styl";
 
 function isValidRouteState(state: unknown): state is DictationRouteState {
@@ -28,11 +28,12 @@ export default function DictationPage() {
   const [loading, setLoading] = useState(true);
   const [dictationWords, setDictationWords] = useState<DictationWordItem[]>([]);
   const [repeatTimes, setRepeatTimes] = useState(3);
-  const [intervalSeconds, setIntervalSeconds] = useState(6);
+  const [intervalSeconds, setIntervalSeconds] = useState(5);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
-  const { isPreparing, playPrepareAnnouncement, stopPrepareTask, stopPlaybackTask } =
+  const {isPreparing, playPrepareAnnouncement, stopPrepareTask, stopPlaybackTask, replayCurrent} =
     useDictationPlayback({
       dictationWords,
       repeatTimes,
@@ -43,7 +44,7 @@ export default function DictationPage() {
       setCurrentIndex,
     });
 
-  const { resetPreload } = useDictationPreload({ dictationWords, currentIndex, loading });
+  const {resetPreload} = useDictationPreload({dictationWords, currentIndex, loading});
 
   const routeState = useMemo(() => {
     return isValidRouteState(location.state) ? location.state : null;
@@ -51,7 +52,7 @@ export default function DictationPage() {
 
   useEffect(() => {
     if (!routeState) {
-      navigate("/books", { replace: true });
+      navigate("/books", {replace: true});
     }
   }, [navigate, routeState]);
 
@@ -81,11 +82,12 @@ export default function DictationPage() {
       } catch (error) {
         if (!disposed) {
           window.alert((error as Error).message || "词汇加载失败");
-          navigate("/books", { replace: true });
+          navigate("/books", {replace: true});
         }
       } finally {
         if (!disposed) {
           setLoading(false);
+          setHasLoadedOnce(true);
         }
       }
     };
@@ -114,10 +116,12 @@ export default function DictationPage() {
   const totalCount = dictationWords.length;
   const completedCount = totalCount === 0 ? 0 : Math.min(currentIndex, totalCount);
   const remainingCount = Math.max(totalCount - completedCount, 0);
+  const isInitialLoading = loading && !hasLoadedOnce;
 
   const isPrevDisabled = loading || isPreparing || currentIndex === 0;
   const isNextDisabled = loading || isPreparing || currentIndex >= dictationWords.length - 1;
   const isPauseDisabled = loading || isPreparing || dictationWords.length === 0;
+  const isReplayDisabled = loading || isPreparing || dictationWords.length === 0;
 
   const handlePrev = () => {
     stopPlaybackTask();
@@ -139,19 +143,36 @@ export default function DictationPage() {
     });
   };
 
+  const handleReplay = () => {
+    if (isPaused) {
+      setIsPaused(false);
+    }
+    replayCurrent();
+  };
+
   return (
     <div className="dictation-page">
       <div className="dictation-board">
-        <div className="dictation-progress">
-          已完成 {completedCount} 个，剩余 {remainingCount} 个
-        </div>
+        {isInitialLoading && (
+          <div className="dictation-tip">正在加载听写资源，请稍候...</div>
+        )}
+        {!isInitialLoading && (
+          <div className="dictation-progress">
+            已完成 {completedCount} 个，剩余 {remainingCount} 个
+          </div>
+        )}
         <div className="dictation-actions">
           <div className="dictation-btn dictation-btn-prev">
             <Button onClick={handlePrev} disabeld={isPrevDisabled}>
               上一个
             </Button>
           </div>
-          <div className="dictation-btn dictation-btn-pause">
+          <div className="dictation-btn dictation-btn-replay">
+            <Button type="primary" onClick={handleReplay} disabeld={isReplayDisabled}>
+              重播
+            </Button>
+          </div>
+          <div className="dictation-btn">
             <Button type="primary" onClick={handlePauseToggle} disabeld={isPauseDisabled}>
               {isPaused ? "继续" : "暂停"}
             </Button>

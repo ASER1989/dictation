@@ -20,6 +20,7 @@ export type DictationPlaybackHandle = {
   playPrepareAnnouncement: () => Promise<void>;
   stopPrepareTask: () => void;
   stopPlaybackTask: () => void;
+  replayCurrent: () => void;
 };
 
 export const useDictationPlayback = ({
@@ -32,6 +33,7 @@ export const useDictationPlayback = ({
   setCurrentIndex,
 }: DictationPlaybackOptions): DictationPlaybackHandle => {
   const [isPreparing, setIsPreparing] = useState(false);
+  const [replayNonce, setReplayNonce] = useState(0);
   const timerRef = useRef<number | null>(null);
   const playTaskIdRef = useRef(0);
   const prepareTaskIdRef = useRef(0);
@@ -71,6 +73,11 @@ export const useDictationPlayback = ({
     playTaskIdRef.current += 1;
     clearPlayback();
   }, [clearPlayback]);
+
+  const replayCurrent = useCallback(() => {
+    stopPlaybackTask();
+    setReplayNonce((prev) => prev + 1);
+  }, [stopPlaybackTask]);
 
   const stopPrepareTask = useCallback(() => {
     prepareTaskIdRef.current += 1;
@@ -331,6 +338,7 @@ export const useDictationPlayback = ({
     isPaused,
     loading,
     playCompletionAnnouncement,
+    replayNonce,
     repeatTimes,
     setCurrentIndex,
   ]);
@@ -354,5 +362,6 @@ export const useDictationPlayback = ({
     playPrepareAnnouncement,
     stopPrepareTask,
     stopPlaybackTask,
+    replayCurrent,
   };
 };
