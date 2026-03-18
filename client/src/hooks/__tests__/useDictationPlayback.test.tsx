@@ -9,9 +9,11 @@ describe("useDictationPlayback", () => {
     vi.useFakeTimers();
 
     try {
-      const fetchMock = vi.fn(async () => ({
-        arrayBuffer: async () => new ArrayBuffer(8),
-      }));
+      const fetchMock = vi.fn(
+        async (_input: RequestInfo | URL, _init?: RequestInit) => ({
+          arrayBuffer: async () => new ArrayBuffer(8),
+        }),
+      );
       vi.stubGlobal("fetch", fetchMock as unknown as typeof fetch);
 
       installMockAudioContext();

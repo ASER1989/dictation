@@ -140,7 +140,14 @@
     background #fbfdff
 
   .item-main
-    min-width 0
+    width 100%
+
+  .item-header
+    display flex
+    justify-content space-between
+
+  .item-cap
+    flex 1
 
   .item-title
     font-size 16px
@@ -158,6 +165,19 @@
     font-size 13px
     line-height 1.5
     word-break break-all
+    display flex
+    align-items center
+    gap 8px
+    flex-wrap wrap
+    justify-content space-between
+
+  .item-word-toggle
+    flex-shrink 0
+
+    .button
+      font-size 12px
+      padding 3px 10px
+      border-radius 14px
 
   .item-word-list
     margin-top 8px

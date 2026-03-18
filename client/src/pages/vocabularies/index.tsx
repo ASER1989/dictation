@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {useEffect, useMemo, useRef, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import Button from "@client/components/button";
 import Textarea from "@client/components/textarea";
 import {
@@ -9,8 +9,8 @@ import {
   regenerateVocabularyAudio,
   updateVocabulary,
 } from "@client/models/vocabularyApi";
-import type { RegenerateAudioOptions } from "@client/models/vocabularyApi";
-import type { VocabularyBook, VocabularyBookPayload } from "@client/types/vocabulary";
+import type {RegenerateAudioOptions} from "@client/models/vocabularyApi";
+import type {VocabularyBook, VocabularyBookPayload} from "@client/types/vocabulary";
 import "./index.styl";
 
 type FormState = {
@@ -31,13 +31,13 @@ const regenerateVoiceOptions: Array<{
   label: string;
   value: NonNullable<RegenerateAudioOptions["voice"]>;
 }> = [
-  { label: "tongtong", value: "tongtong" },
-  { label: "chuichui", value: "chuichui" },
-  { label: "xiaochen", value: "xiaochen" },
-  { label: "jam", value: "jam" },
-  { label: "kazi", value: "kazi" },
-  { label: "douji", value: "douji" },
-  { label: "luodo", value: "luodo" },
+  {label: "tongtong", value: "tongtong"},
+  {label: "chuichui", value: "chuichui"},
+  {label: "xiaochen", value: "xiaochen"},
+  {label: "jam", value: "jam"},
+  {label: "kazi", value: "kazi"},
+  {label: "douji", value: "douji"},
+  {label: "luodo", value: "luodo"},
 ];
 
 function wordsToText(words: string[]): string {
@@ -85,9 +85,21 @@ export default function VocabulariesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(defaultFormState);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(() => new Set());
 
   const isEditing = editingId !== null;
   const hasItems = items.length > 0;
+  const toggleItemWords = (itemId: string) => {
+    setExpandedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(itemId)) {
+        next.delete(itemId);
+      } else {
+        next.add(itemId);
+      }
+      return next;
+    });
+  };
 
   const submitLabel = useMemo(() => {
     if (saving) {
@@ -102,6 +114,7 @@ export default function VocabulariesPage() {
     try {
       const data = await fetchVocabularyBooks();
       setItems(data);
+      setExpandedItems(new Set());
     } catch (error) {
       setErrorMessage((error as Error).message || "加载词汇表失败");
     } finally {
@@ -353,51 +366,73 @@ export default function VocabulariesPage() {
 
           {!loading && hasItems && (
             <div className="list-wrap">
-              {items.map((item) => (
-                <div className="list-item" key={item.id}>
-                  <div className="item-main">
-                    <div className="item-title">{item.name}</div>
-                    <div className="item-meta">
-                      {item.unit}
-                      {item.lesson ? ` / ${item.lesson}` : ""}
-                    </div>
-                    <div className="item-words-summary">词汇数量：{item.words.length}</div>
-                    <div className="item-word-list">
-                      {item.words.length === 0 && <div className="item-word-empty">（无词汇）</div>}
-                      {item.words.map((word, index) => {
-                        const wordKey = `${item.id}-${index}`;
-                        const hasAudio = Boolean(getWordAudioFileName(item, word));
-                        const isPlaying = playingWordKey === wordKey;
-                        const isRegenerating = regeneratingWordKey === wordKey;
-
-                        return (
-                          <div className="word-row" key={wordKey}>
-                            <div className="word-label">{word}</div>
-                            <div className="word-actions">
-                              <Button
-                                onClick={() => handlePreviewWordAudio(item, word, index)}
-                                disabeld={!hasAudio || isRegenerating}
-                              >
-                                {isPlaying ? "播放中" : "试听"}
-                              </Button>
-                              <Button
-                                onClick={() => handleRegenerateWordAudio(item, word, index)}
-                                disabeld={isRegenerating}
-                              >
-                                {isRegenerating ? "生成中" : "重新生成"}
-                              </Button>
-                            </div>
+              {items.map((item) => {
+                const isExpanded = expandedItems.has(item.id);
+                return (
+                  <div className="list-item" key={item.id}>
+                    <div className="item-main">
+                      <div className="item-header">
+                        <div className="item-cap">
+                          <div className="item-title">{item.name}</div>
+                          <div className="item-meta">
+                            {item.unit}
+                            {item.lesson ? ` / ${item.lesson}` : ""}
                           </div>
-                        );
-                      })}
+                        </div>
+                        <div className="item-actions">
+                          <Button type="primary" onClick={() => handleEdit(item)}>编辑</Button>
+                          <Button onClick={() => handleDelete(item)}>删除</Button>
+                        </div>
+                      </div>
+                      <div className="item-words-summary">
+                        <span>词汇数量：{item.words.length}</span>
+                        <span className="item-word-toggle">
+                          <Button
+                            onClick={() => toggleItemWords(item.id)}
+                            disabeld={item.words.length === 0}
+                          >
+                            {isExpanded ? " 收起" : "展开"}
+                          </Button>
+                        </span>
+                      </div>
+                      {isExpanded && (
+                        <div className="item-word-list">
+                          {item.words.length === 0 && (
+                            <div className="item-word-empty">（无词汇）</div>
+                          )}
+                          {item.words.map((word, index) => {
+                            const wordKey = `${item.id}-${index}`;
+                            const hasAudio = Boolean(getWordAudioFileName(item, word));
+                            const isPlaying = playingWordKey === wordKey;
+                            const isRegenerating = regeneratingWordKey === wordKey;
+
+                            return (
+                              <div className="word-row" key={wordKey}>
+                                <div className="word-label">{word}</div>
+                                <div className="word-actions">
+                                  <Button
+                                    onClick={() => handlePreviewWordAudio(item, word, index)}
+                                    disabeld={!hasAudio || isRegenerating}
+                                  >
+                                    {isPlaying ? "播放中" : "试听"}
+                                  </Button>
+                                  <Button
+                                    onClick={() => handleRegenerateWordAudio(item, word, index)}
+                                    disabeld={isRegenerating}
+                                  >
+                                    {isRegenerating ? "生成中" : "重新生成"}
+                                  </Button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
+
                   </div>
-                  <div className="item-actions">
-                    <Button onClick={() => handleEdit(item)}>编辑</Button>
-                    <Button onClick={() => handleDelete(item)}>删除</Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

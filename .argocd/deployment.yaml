@@ -95,7 +95,6 @@ spec:
         - name: dictation-service
           port: 80
       middlewares:
-        - name: cache-control
         - name: compress-middleware
   tls:
     secretName: dictation-cert
